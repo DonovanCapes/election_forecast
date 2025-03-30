@@ -3,7 +3,7 @@
 # Canadian Federal Election Forecast Model
 # Author: Donovan Capes
 # Created: 2020/09/07
-# Last Edited: 2021/04/18
+# Last Edited: 2025/03/29
 #
 ######################################################################################################################
 
@@ -19,31 +19,31 @@ from datetime import date, datetime
 ######################################################################################################################
 # Set directory, enable coding timer, and connect SQLite3 database
 ######################################################################################################################
-os.chdir(r"C:\Users\Donovan\Documents\Visual Studio Code\ElectionModel")
+os.chdir(r"C:\projects\election_forecast")
 
 start_time = time.time()
 
-conn = sqlite3.connect('ElectionModel.db')
+conn = sqlite3.connect('election_database\election_database.db')
 c = conn.cursor()
 
 ######################################################################################################################
-# Import 2019 election results
+# Import 2021 election results
 ######################################################################################################################
-results2019 = c.execute("SELECT party, votepercent2019 FROM electionresults")
-election2019 = pd.DataFrame(results2019)
-election2019 = dict(zip(election2019[0], election2019[1]))
-election2019 = {k.lower(): v for k, v in election2019.items()}
+results2021 = c.execute("SELECT party, voteshare2021 FROM electionresults")
+election2021 = pd.DataFrame(results2021)
+election2021 = dict(zip(election2021[0], election2021[1]))
+election2021 = {k.lower(): v for k, v in election2021.items()}
 
 ######################################################################################################################
 # Import riding results and Election Model variables
 ######################################################################################################################
-nationaltable = c.execute("SELECT t1.id, t2.province, t2.riding, t1.party, t1.votepercentage, t1.leanvsfederal FROM results2019 AS t1 JOIN ridings AS t2 ON t1.id = t2.id")
+nationaltable = c.execute("SELECT t1.id, t2.province, t2.riding, t1.party, t1.votepercent, t1.leanvsfederal FROM results2021 AS t1 JOIN ridings AS t2 ON t1.id = t2.id")
 nationaldatabase = pd.DataFrame(nationaltable)
 
 ######################################################################################################################
 # Create list of riding IDs
 ######################################################################################################################
-ridingids = c.execute("SELECT DISTINCT id FROM results2019")
+ridingids = c.execute("SELECT DISTINCT id FROM results2021")
 ridingidids = pd.DataFrame(ridingids)
 ridingidlist = ridingidids[0].tolist()
 
@@ -54,7 +54,7 @@ dfridingprobabilities = pd.DataFrame(index = ridingidlist, columns = ['lpc', 'cp
 dfridingprobabilities = dfridingprobabilities.fillna(0)
 
 ######################################################################################################################
-# Import polling data from ElectionModel.db
+# Import polling data from election_database.db
 ######################################################################################################################
 pollsdict = c.execute("SELECT * FROM polls WHERE region = 'National'")
 polls = pd.DataFrame(pollsdict, columns = ['region', 'lastdate', 'firm', 'method', 'sample', 'error', 'lpc', 'cpc', 'ndp', 'gpc', 'bq', 'other'])
@@ -95,7 +95,7 @@ def weightavg(party):
 # Global variables for storing model outputs
 ######################################################################################################################
 n = 1
-path = "C:/Users/Donovan/Documents/Visual Studio Code/ElectionModel/SimResults"
+path = "C:/projects/election_forecast/model_results"
 
 ######################################################################################################################
 # Monte Carlo Simulation
@@ -113,7 +113,7 @@ def SimulateMultipleElections(numsims):
 
     # Create DataFrame to store sim results
     dfelectionresults = pd.DataFrame(columns = ['lpc', 'cpc', 'ndp', 'gpc', 'bq', 'other'])
-    dfridingpercentages = pd.DataFrame(columns = ['districtid', 'party', 'votepercentage'])
+    dfridingpercentages = pd.DataFrame(columns = ['districtid', 'party', 'votepercent'])
     # Set win counts to zero
     lpc = cpc = ndp = gpc = bq = other = 0
 
@@ -178,21 +178,21 @@ def SimulateMultipleElections(numsims):
 
     # calculate the average vote percentage for each party in each riding
     dfridingpercentagesavg = dfridingpercentages.groupby(['districtid', 'party']).mean()
-    dfridingpercentagesavg = dfridingpercentagesavg.pivot_table(index = 'districtid', columns = 'party', values = 'votepercentage')
+    dfridingpercentagesavg = dfridingpercentagesavg.pivot_table(index = 'districtid', columns = 'party', values = 'votepercent')
     dfridingpercentagesavg = dfridingpercentagesavg.round(1)
     if "other" not in dfridingpercentagesavg:
         dfridingpercentagesavg['other'] = np.nan
     
     # calculate 2 standard deviations
     dfridingpercentagesstd = dfridingpercentages.groupby(['districtid', 'party']).std(ddof = 4)
-    dfridingpercentagesstd = dfridingpercentagesstd.pivot_table(index = 'districtid', columns = 'party', values = 'votepercentage')
+    dfridingpercentagesstd = dfridingpercentagesstd.pivot_table(index = 'districtid', columns = 'party', values = 'votepercent')
     dfridingpercentagesstd = round(dfridingpercentagesstd * 2, 1)
     dfridingpercentagesstd = dfridingpercentagesstd.rename(columns = {'bq':'bqstd', 'cpc':'cpcstd', 'gpc':'gpcstd', 'lpc':'lpcstd', 'ndp':'ndpstd'})
     masterdf = pd.merge(dfridingpercentagesavg, dfridingpercentagesstd, on = 'districtid', how = 'left')
     masterdf = masterdf.fillna(0)
 
    # export riding results
-    ridingpercentpath = os.path.join(path, 'ridingvotepercentages.csv')
+    ridingpercentpath = os.path.join(path, 'ridingvotepercents.csv')
     masterdf.to_csv(ridingpercentpath, index = True)
 
     print("Run time: %s seconds" % (time.time() - start_time))
@@ -204,13 +204,13 @@ def SimulateElection():
     lpcwins = cpcwins = ndpwins = gpcwins = bqwins = otherwins = 0
     k = p = 0
     # Create DataFrames to store riding results
-    dfridingresults = pd.DataFrame(columns = ['districtid', 'party', 'votepercentage'])
+    dfridingresults = pd.DataFrame(columns = ['districtid', 'party', 'votepercent'])
 
     # Perform on simulation for each riding
     for riding in ridingidlist:
         ridingid = ridingidlist[k]
-        district = c.execute("SELECT * FROM results2019 WHERE id = ?", (ridingid, ))
-        district = pd.DataFrame(district, columns = ['id', 'year', 'party', 'candidate', 'votecount', 'votepercentage', 'elected',\
+        district = c.execute("SELECT * FROM results2021 WHERE id = ?", (ridingid, ))
+        district = pd.DataFrame(district, columns = ['id', 'year', 'party', 'candidate', 'votecount', 'votepercent', 'elected',\
                                 'incumbent', 'leanvsprovince', 'leanvsfederal'])
         
         resultsdict = {}
@@ -223,18 +223,18 @@ def SimulateElection():
             try:
                 party = row.party
                 party = party.lower()
-                vote2019 = float(district['votepercentage'][m])
+                vote2021 = float(district['votepercent'][m])
                 partypoll = float(weightavg(party))
                 pollwerr = AddErr(partypoll)
-                natvote = float(election2019[party])
+                natvote = float(election2021[party])
                 propchange = (pollwerr - natvote) / natvote
                 # distlean = float(district['leanvsfederal'][m])
-                newvote = vote2019 + (propchange * vote2019)
+                newvote = vote2021 + (propchange * vote2021)
                 if newvote < 0:
                     newvote = 0
                 
                 # Compile results in DataFrame for export and analysis
-                newrow = [{'districtid': ridingid, 'party': party, 'votepercentage': newvote}]
+                newrow = [{'districtid': ridingid, 'party': party, 'votepercent': newvote}]
                 dfridingresults = dfridingresults.append(newrow, ignore_index = True)
 
                 # Add each party's chances in riding to dict
@@ -271,7 +271,7 @@ def SimulateElection():
         k += 1
 
     # Normalize for 100% vote total
-    dfridingresults['votepercentage'] = (dfridingresults['votepercentage'] / dfridingresults.groupby('districtid')['votepercentage'].transform('sum')) * 100
+    dfridingresults['votepercent'] = (dfridingresults['votepercent'] / dfridingresults.groupby('districtid')['votepercent'].transform('sum')) * 100
     
     # Export election data as csv
     global n
@@ -287,10 +287,10 @@ SimulateMultipleElections(10000)
 ######################################################################################################################
 # Execute script to update seat projections
 ######################################################################################################################
-exec(open('SeatProjectionGraphs.py').read())
+#exec(open('SeatProjectionGraphs.py').read())
 
 ######################################################################################################################
 # Update GeoJSON
 ######################################################################################################################
-os.chdir(r"C:\Users\Donovan\Documents\Visual Studio Code\ElectoralMap")
-exec(open('exportgeojson.py').read())
+#os.chdir(r"C:\Users\Donovan\Documents\Visual Studio Code\ElectoralMap")
+#exec(open('exportgeojson.py').read())
