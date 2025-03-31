@@ -1,0 +1,15 @@
+*.json
+*.geojson
+*.csv
+*.csv
+*.qmd
+election_map/ridings.db
+election_map/ridings-v1.js
+election_map/ridings.js
+election_map/ridings2020-08-04.js
+election_map/ridings2020-09-09.js
+election_map/wordpress.php
+election_map/electoralmap.html
+election_map/combinegeojson.sql
+election_map/2019ridingboundaries.js
+election_database/voteshare.csv

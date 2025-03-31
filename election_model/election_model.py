@@ -19,11 +19,11 @@ from datetime import date, datetime
 ######################################################################################################################
 # Set directory, enable coding timer, and connect SQLite3 database
 ######################################################################################################################
-os.chdir(r"C:\projects\election_forecast")
+os.chdir("C://projects//election_forecast")
 
 start_time = time.time()
 
-conn = sqlite3.connect('election_database\election_database.db')
+conn = sqlite3.connect('election_database/election_database.db')
 c = conn.cursor()
 
 ######################################################################################################################
@@ -37,7 +37,7 @@ election2021 = {k.lower(): v for k, v in election2021.items()}
 ######################################################################################################################
 # Import riding results and Election Model variables
 ######################################################################################################################
-nationaltable = c.execute("SELECT t1.id, t2.province, t2.riding, t1.party, t1.votepercent, t1.leanvsfederal FROM results2021 AS t1 JOIN ridings AS t2 ON t1.id = t2.id")
+nationaltable = c.execute("SELECT t1.id, t2.province, t2.riding_name, t1.party, t1.votepercent, t1.leanvsfederal FROM results2021 AS t1 JOIN ridings AS t2 ON t1.id = t2.id")
 nationaldatabase = pd.DataFrame(nationaltable)
 
 ######################################################################################################################
@@ -47,17 +47,18 @@ ridingids = c.execute("SELECT DISTINCT id FROM results2021")
 ridingidids = pd.DataFrame(ridingids)
 ridingidlist = ridingidids[0].tolist()
 
+
 ######################################################################################################################
 # Create DataFrame to store all election simulation results
 ######################################################################################################################
-dfridingprobabilities = pd.DataFrame(index = ridingidlist, columns = ['lpc', 'cpc', 'ndp', 'gpc', 'bq', 'other'])
+dfridingprobabilities = pd.DataFrame(index = ridingidlist, columns = ['lpc', 'cpc', 'ndp', 'gpc', 'bq', 'ppc'])
 dfridingprobabilities = dfridingprobabilities.fillna(0)
 
 ######################################################################################################################
 # Import polling data from election_database.db
 ######################################################################################################################
 pollsdict = c.execute("SELECT * FROM polls WHERE region = 'National'")
-polls = pd.DataFrame(pollsdict, columns = ['region', 'lastdate', 'firm', 'method', 'sample', 'error', 'lpc', 'cpc', 'ndp', 'gpc', 'bq', 'other'])
+polls = pd.DataFrame(pollsdict, columns = ['region', 'lastdate', 'firm', 'method', 'sample', 'error', 'lpc', 'cpc', 'ndp', 'gpc', 'bq', 'ppc'])
 polls = polls.replace(r'^\s*$', 0, regex=True)
 
 ######################################################################################################################
@@ -86,9 +87,12 @@ for i in range(j):
 polls['weight'] = weights
 
 ######################################################################################################################
-# Apply weighting to polls and final output
+# Function to apply poll weightings
 ######################################################################################################################
 def weightavg(party):
+    '''
+    Calculates the weighted polling average for each party
+    '''
     return round(np.average(polls[party].astype('float64'), weights= polls['weight'].astype('float64')), 1)
 
 ######################################################################################################################
@@ -103,6 +107,9 @@ path = "C:/projects/election_forecast/model_results"
 # Function to account for margin of error
 MarginOfError = weightavg('error')
 def AddErr(pollresult):
+    '''
+    Applies random error using a normal distribution and the weighted poll margin of error for each simulation
+    '''
     x = np.random.normal() # generate normal distribution
     x = x/2 # 95% chance of x being between 1 and -1
     x = x * MarginOfError
@@ -110,26 +117,28 @@ def AddErr(pollresult):
 
 # Function to simulate multiple elections
 def SimulateMultipleElections(numsims):
-
+    '''
+    Simulates multiple elections using the simulate election function
+    '''
     # Create DataFrame to store sim results
-    dfelectionresults = pd.DataFrame(columns = ['lpc', 'cpc', 'ndp', 'gpc', 'bq', 'other'])
+    dfelectionresults = pd.DataFrame(columns = ['lpc', 'cpc', 'ndp', 'gpc', 'bq', 'ppc'])
     dfridingpercentages = pd.DataFrame(columns = ['districtid', 'party', 'votepercent'])
     # Set win counts to zero
-    lpc = cpc = ndp = gpc = bq = other = 0
+    lpc = cpc = ndp = gpc = bq = ppc = 0
 
     # iterate over the number of desired simulations
     for sim in range(numsims):
         # run single simulation
-        lpcwins, cpcwins, ndpwins, gpcwins, bqwins, otherwins, dfridingresults = SimulateElection()
+        lpcwins, cpcwins, ndpwins, gpcwins, bqwins, ppcwins, dfridingresults = SimulateElection()
         # add riding percentages to the master copy
-        dfridingpercentages = dfridingpercentages.append(dfridingresults)       
+        dfridingpercentages = pd.concat([dfridingpercentages, dfridingresults])       
         # create dict of parties and vote counts
-        parties = {'lpc': lpcwins, 'cpc': cpcwins, 'ndp': ndpwins, 'gpc': gpcwins, 'bq': bqwins, 'other': otherwins}
+        parties = {'lpc': lpcwins, 'cpc': cpcwins, 'ndp': ndpwins, 'gpc': gpcwins, 'bq': bqwins, 'ppc': ppcwins}
         # determine winner of simulation
         winner = max(parties, key = parties.get)
         # add results to elections DataFrame
-        addrow = [{'lpc': lpcwins, 'cpc': cpcwins, 'ndp': ndpwins, 'gpc': gpcwins, 'bq': bqwins, 'other': otherwins}]
-        dfelectionresults = dfelectionresults.append(addrow, ignore_index = True)
+        addrow = pd.DataFrame([{'lpc': lpcwins, 'cpc': cpcwins, 'ndp': ndpwins, 'gpc': gpcwins, 'bq': bqwins, 'ppc': ppcwins}])
+        dfelectionresults = pd.concat([dfelectionresults, addrow], ignore_index = True)
         # tick up win count for winner
         if winner == 'lpc':
             lpc += 1
@@ -142,7 +151,7 @@ def SimulateMultipleElections(numsims):
         elif winner == 'bq':
             bq += 1
         else:
-            other += 1
+            ppc += 1
     """
     # output probability of each party winning the most seats
     problpc = lpc / numsims
@@ -150,9 +159,9 @@ def SimulateMultipleElections(numsims):
     probndp = ndp / numsims
     probgpc = gpc / numsims
     probbq = bq / numsims
-    probother = other / numsims
+    probppc = ppc / numsims
 
-    probsrow = pd.DataFrame({'lpc': problpc, 'cpc': probcpc, 'ndp': probndp, 'gpc': probgpc, 'bq': probbq, 'other': probother}, index = [0])
+    probsrow = pd.DataFrame({'lpc': problpc, 'cpc': probcpc, 'ndp': probndp, 'gpc': probgpc, 'bq': probbq, 'ppc': probppc}, index = [0])
     dfelectionresults = pd.concat([probsrow, dfelectionresults[:]]).reset_index(drop = True)
     """
     
@@ -162,9 +171,9 @@ def SimulateMultipleElections(numsims):
 
     # calculate mean, max, and minimum seat counts
     seatprojectionstats = pd.DataFrame()
-    seatprojectionstats['Max'] = round(dfelectionresults.max(), 0)
-    seatprojectionstats['Min'] = round(dfelectionresults.min(), 0)
-    seatprojectionstats['Mean'] = round(dfelectionresults.mean(), 0)
+    seatprojectionstats['max'] = dfelectionresults.max()
+    seatprojectionstats['min'] = dfelectionresults.min()
+    seatprojectionstats['mean'] = dfelectionresults.mean()
     seatprojectionpath = os.path.join(path, 'seatstats.csv')
     seatprojectionstats.to_csv(seatprojectionpath, index = False)
 
@@ -180,14 +189,14 @@ def SimulateMultipleElections(numsims):
     dfridingpercentagesavg = dfridingpercentages.groupby(['districtid', 'party']).mean()
     dfridingpercentagesavg = dfridingpercentagesavg.pivot_table(index = 'districtid', columns = 'party', values = 'votepercent')
     dfridingpercentagesavg = dfridingpercentagesavg.round(1)
-    if "other" not in dfridingpercentagesavg:
-        dfridingpercentagesavg['other'] = np.nan
+    if "ppc" not in dfridingpercentagesavg:
+        dfridingpercentagesavg['ppc'] = np.nan
     
     # calculate 2 standard deviations
     dfridingpercentagesstd = dfridingpercentages.groupby(['districtid', 'party']).std(ddof = 4)
     dfridingpercentagesstd = dfridingpercentagesstd.pivot_table(index = 'districtid', columns = 'party', values = 'votepercent')
     dfridingpercentagesstd = round(dfridingpercentagesstd * 2, 1)
-    dfridingpercentagesstd = dfridingpercentagesstd.rename(columns = {'bq':'bqstd', 'cpc':'cpcstd', 'gpc':'gpcstd', 'lpc':'lpcstd', 'ndp':'ndpstd'})
+    dfridingpercentagesstd = dfridingpercentagesstd.rename(columns = {'bq':'bqstd', 'cpc':'cpcstd', 'gpc':'gpcstd', 'lpc':'lpcstd', 'ndp':'ndpstd', 'ppc':'ppcstd'})
     masterdf = pd.merge(dfridingpercentagesavg, dfridingpercentagesstd, on = 'districtid', how = 'left')
     masterdf = masterdf.fillna(0)
 
@@ -201,7 +210,7 @@ def SimulateMultipleElections(numsims):
 # Function to simulate a single election
 ######################################################################################################################
 def SimulateElection():
-    lpcwins = cpcwins = ndpwins = gpcwins = bqwins = otherwins = 0
+    lpcwins = cpcwins = ndpwins = gpcwins = bqwins = ppcwins = 0
     k = p = 0
     # Create DataFrames to store riding results
     dfridingresults = pd.DataFrame(columns = ['districtid', 'party', 'votepercent'])
@@ -215,37 +224,38 @@ def SimulateElection():
         
         resultsdict = {}
 
-        # Variable for iterating within each districts
+        # Variable for iterating within each district
         m = 0
 
         # Calculate election chances for each party
         for row in district.itertuples():
+            
             try:
-                party = row.party
-                party = party.lower()
-                vote2021 = float(district['votepercent'][m])
-                partypoll = float(weightavg(party))
-                pollwerr = AddErr(partypoll)
-                natvote = float(election2021[party])
-                propchange = (pollwerr - natvote) / natvote
+                party = row.party.lower() # get party name
+                vote2021 = float(district['votepercent'][m]) # party vote in riding 
+                partypoll = float(weightavg(party)) # current federal level party polling 
+                pollwerr = AddErr(partypoll) # apply polling error (should this be at the federal level instead of each riding?)
+                natvote = float(election2021[party]) # get national vote percentage from 2021
+                propchange = (pollwerr - natvote) / natvote # calculate the proportion of change
                 # distlean = float(district['leanvsfederal'][m])
-                newvote = vote2021 + (propchange * vote2021)
+                newvote = vote2021 + (propchange * vote2021) # recalculate the vote based on the proportion of change
                 if newvote < 0:
                     newvote = 0
                 
                 # Compile results in DataFrame for export and analysis
-                newrow = [{'districtid': ridingid, 'party': party, 'votepercent': newvote}]
-                dfridingresults = dfridingresults.append(newrow, ignore_index = True)
+                newrow = pd.DataFrame([{'districtid': ridingid, 'party': party, 'votepercent': newvote}])
+                dfridingresults = pd.concat([dfridingresults,newrow], ignore_index = True)
 
                 # Add each party's chances in riding to dict
                 resultsdict[party] = newvote
-
+                
                 # Tick up variable
                 m += 1
                 
             except:
                 m += 1
                 continue
+            
         
         # Determine riding winner
         winner = max(resultsdict, key = resultsdict.get)
@@ -260,7 +270,7 @@ def SimulateElection():
         elif winner == 'bq':
             bqwins += 1
         else:
-            otherwins += 1
+            ppcwins += 1
 
         # Update global dataframe
         dfridingprobabilities.loc[dfridingprobabilities.index[p], winner] = \
@@ -276,12 +286,14 @@ def SimulateElection():
     # Export election data as csv
     global n
     filename = os.path.join(path, 'ridingsims' + str(n) +'.csv')
-    #dfridingresults.to_csv(filename, index = False)
+    dfridingresults.to_csv(filename, index = False)
     print("Simulation #" + str(n) + ": complete")
     n += 1
     # Return the number of seats each party won
-    return lpcwins, cpcwins, ndpwins, gpcwins, bqwins, otherwins, dfridingresults
+    return lpcwins, cpcwins, ndpwins, gpcwins, bqwins, ppcwins, dfridingresults
 
+
+#SimulateElection()
 SimulateMultipleElections(10000)
 
 ######################################################################################################################
@@ -292,5 +304,5 @@ SimulateMultipleElections(10000)
 ######################################################################################################################
 # Update GeoJSON
 ######################################################################################################################
-#os.chdir(r"C:\Users\Donovan\Documents\Visual Studio Code\ElectoralMap")
+#os.chdir("C://Users//Donovan//Documents//Visual Studio Code//ElectoralMap")
 #exec(open('exportgeojson.py').read())
