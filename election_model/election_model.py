@@ -183,6 +183,7 @@ def SimulateMultipleElections(numsims):
 
     # export riding probabilities dataframe
     ridingprobpath = os.path.join(path, 'ridingprobabilities.csv')
+    dfridingprobabilities = dfridingprobabilities.rename(columns={'': 'FED_NUM', 'lpc': 'LPCwins', 'cpc': 'CPCwins', 'ndp': 'NDPwins', 'gpc': 'GPCwins', 'bq': 'BQwins', 'ppc': 'PPCwins'})
     dfridingprobabilities.to_csv(ridingprobpath, index = True)
 
     # calculate the average vote percentage for each party in each riding
@@ -285,8 +286,8 @@ def SimulateElection():
     
     # Export election data as csv
     global n
-    filename = os.path.join(path, 'ridingsims' + str(n) +'.csv')
-    dfridingresults.to_csv(filename, index = False)
+    #filename = os.path.join(path, 'ridingsims' + str(n) +'.csv')
+    #dfridingresults.to_csv(filename, index = False)
     print("Simulation #" + str(n) + ": complete")
     n += 1
     # Return the number of seats each party won
@@ -294,7 +295,7 @@ def SimulateElection():
 
 
 #SimulateElection()
-SimulateMultipleElections(10000)
+SimulateMultipleElections(10)
 
 ######################################################################################################################
 # Execute script to update seat projections
