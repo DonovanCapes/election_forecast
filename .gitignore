@@ -14,3 +14,4 @@ election_map/electoralmap.html
 election_map/combinegeojson.sql
 election_map/2019ridingboundaries.js
 election_database/voteshare.csv
+election_model/sqlite_queries.py
