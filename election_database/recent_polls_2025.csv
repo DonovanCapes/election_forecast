@@ -1,86 +1,31 @@
 ﻿region,lastdate,firm,method,sample,error,lpc,cpc,ndp,gpc,bq,ppc
-National,2025-03-28,Liaison Strategies / NEPMCC,IVR,1500,2.5,44,36,8,3,6,2
-National,2025-03-28,Mainstreet Research,NET,1621,2.4,43,40,6,2,5,2
-National,2025-03-27,Liaison Strategies / NEPMCC,IVR,1500,2.5,43,38,7,2,6,2
-National,2025-03-27,Mainstreet Research,NET,1657,2.4,44,41,7,2,5,1
-National,2025-03-26,Liaison Strategies / NEPMCC,IVR,1500,2.5,44,37,6,2,6,3
-National,2025-03-26,Mainstreet Research,NET,1380,2.6,45,41,6,1,5,1
-National,2025-03-25,Liaison Strategies / NEPMCC,IVR,1500,2.5,42,38,7,2,6,3
-National,2025-03-25,Mainstreet Research,NET,1230,2.8,44,40,7,2,5,1
-National,2025-03-25,EKOS Research,IVR,1621,2.4,50,35,7,2,4,2
-National,2025-03-25,Abacus Data,NET,2000,2.2,38,37,11,4,6,3
-National,2025-03-24,Research Co.,NET,1003,3.1,41,37,9,3,7,2
-National,2025-03-24,Liaison Strategies / NEPMCC,IVR,1500,2.5,42,37,7,3,6,4
-National,2025-03-24,Mainstreet Research,NET,1500,2.5,44,39,7,2,6,2
-National,2025-03-24,Angus Reid Institute,NET,2400,2,46,38,7,1,6,1
-National,2025-03-23,Léger / Canadian Press,NET,1599,2.4,44,38,6,3,5,3
-National,2025-03-23,Liaison Strategies / NEPMCC,IVR,1500,2.5,40,36,9,4,6,3
-National,2025-03-23,Mainstreet Research,NET,1661,2.4,44,38,7,1,6,3
-National,2025-03-22,Pallas Data,IVR,1225,2.8,42,38,8,2,7,2
-National,2025-03-22,Liaison Strategies / NEPMCC,IVR,1500,2.5,39,37,9,4,7,3
-National,2025-03-21,Innovative Research Group,NET,1548,2.5,36,34,13,5,7,2
-National,2025-03-21,Liaison Strategies / NEPMCC,IVR,1500,2.5,38,36,10,4,6,3
-National,2025-03-21,Nanos Research,TEL,1100,2.9,34,37,14,4,8,2
-National,2025-03-20,Liaison Strategies / NEPMCC,IVR,1500,2.5,38,36,11,4,7,3
-National,2025-03-20,Abacus Data,NET,1500,2.5,36,39,12,4,6,2
-National,2025-03-19,Liaison Strategies / NEPMCC,IVR,1500,2.5,40,36,9,4,6,3
-National,2025-03-18,Liaison Strategies / NEPMCC,IVR,1500,2.5,40,36,10,4,6,2
-National,2025-03-17,Liaison Strategies / NEPMCC,IVR,1500,2.5,39,36,10,4,6,2
-National,2025-03-17,Ipsos / Global News,NET,1000,3.1,42,36,10,2,6,3
-National,2025-03-16,Léger / National Post,NET,1568,2.5,42,39,9,3,5,2
-National,2025-03-16,Liaison Strategies / NEPMCC,IVR,1500,2.5,37,35,12,5,7,2
-National,2025-03-16,Angus Reid Institute,NET,4009,1.5,42,37,9,2,8,1
-National,2025-03-15,Liaison Strategies / NEPMCC,IVR,1500,2.5,38,35,12,5,6,2
-National,2025-03-14,Liaison Strategies / NEPMCC,IVR,1500,2.5,39,35,12,5,5,2
-National,2025-03-14,Nanos Research,TEL,1074,3,34,35,16,4,8,2
-National,2025-03-13,Innovative Research Group,NET,1558,2.5,33,39,13,4,7,2
-National,2025-03-13,Liaison Strategies / NEPMCC,IVR,1501,2.5,38,34,13,6,6,2
-National,2025-03-13,EKOS Research,IVR,1025,3.1,50,32,8,2,5,3
-National,2025-03-13,Mainstreet Research,NET,1016,3.1,41,39,8,2,6,3
-National,2025-03-12,Abacus Data / Toronto Star,NET,1700,2.4,34,38,15,4,7,2
-National,2025-03-11,EKOS Research,NET,1524,2.5,42,33,13,3,4,4
-National,2025-03-10,Léger / National Post,NET,1548,2.5,37,37,11,5,6,2
-National,2025-03-09,Innovative Research Group,NET,1695,2.4,31,41,14,4,6,3
-National,2025-03-07,Nanos Research,TEL,1052,3,35,36,15,4,8,2
-National,2025-03-05,EKOS Research,IVR,1980,2.2,41,36,13,3,5,1
-National,2025-03-02,Léger / National Post,NET,1548,2.5,30,43,13,4,6,2
-National,2025-02-28,Innovative Research Group,NET,1488,2.5,31,38,16,5,6,3
-National,2025-02-28,Nanos Research,TEL,1024,3.1,34,37,15,4,8,2
-National,2025-02-25,Abacus Data,NET,1500,2.5,29,41,14,4,6,3
-National,2025-02-24,Ipsos / Global News,NET,1000,3.1,38,36,12,4,6,3
-National,2025-02-24,Innovative Research Group,NET,1789,2.3,30,39,16,6,6,0
-National,2025-02-24,EKOS Research,IVR,1239,2.8,38,37,12,4,4,3
-National,2025-02-24,Pollara Strategic Insights,NET,1506,2.5,32,42,11,4,8,2
-National,2025-02-23,Léger,NET,1534,2.5,35,38,14,4,7,2
-National,2025-02-21,Nanos Research,TEL,1026,3.1,33,37,16,4,8,2
-National,2025-02-17,Léger / National Post,NET,1550,2.5,33,41,11,3,6,3
-National,2025-02-17,Innovative Research Group,NET,2015,2.2,27,40,16,4,9,4
-National,2025-02-14,Nanos Research,TEL,1018,3.1,32,39,15,4,8,2
-National,2025-02-13,EKOS Research,NET,1468,2.6,34,39,15,4,5,3
-National,2025-02-12,Abacus Data,NET,1000,3.1,25,45,17,4,8,3
-National,2025-02-11,Abacus Data,NET,1000,3.1,27,46,15,3,7,3
-National,2025-02-10,Léger / The Canadian Press,NET,1590,2.4,31,40,14,6,7,2
-National,2025-02-07,Innovative Research Group,NET,1795,2.3,27,40,16,6,7,3
-National,2025-02-07,Nanos Research,TEL,1005,3.1,30,38,16,5,8,2
-National,2025-02-06,Pallas Data,IVR,1241,2.8,34,40,12,3,7,3
-National,2025-02-03,Ipsos / Global News,NET,1000,3.1,28,41,16,3,9,3
-National,2025-01-31,Nanos Research,TEL,1025,3.1,26,42,17,6,7,2
-National,2025-01-29,EKOS Research,NET,1025,3.1,32,34,18,5,8,3
-National,2025-01-27,EKOS Research,IVR,1448,2.6,33,36,13,5,7,5
-National,2025-01-26,Léger / National Post,NET,1527,2.5,25,43,16,4,9,2
-National,2025-01-26,Abacus Data,NET,2205,2.1,22,43,18,5,9,3
-National,2025-01-24,Nanos Research,TEL,1023,3.1,25,42,18,6,7,2
-National,2025-01-21,EKOS Research,IVR,1018,3.1,32,39,14,3,7,3
-National,2025-01-17,Nanos Research,TEL,1040,3,21,45,19,5,8,2
-National,2025-01-16,EKOS Research,IVR,1036,3,28,39,17,5,7,3
-National,2025-01-15,Mainstreet Research,NET,2205,2.1,26,45,13,4,8,3
-National,2025-01-14,Abacus Data,NET,1500,2.5,20,47,18,3,8,3
-National,2025-01-13,Léger,NET,1545,2.5,21,47,17,4,8,2
-National,2025-01-10,Nanos Research,TEL,1001,3.1,20,47,18,5,8,2
-National,2025-01-08,Relay Strategies,NET,1034,3,21,45,16,4,9,4
-National,2025-01-08,EKOS Research,IVR,953,3.2,26,42,17,5,7,3
-National,2025-01-07,Abacus Data,NET,2500,1.9,20,47,18,3,8,3
-National,2025-01-07,Ipsos / Global News,NET,1000,3.1,20,46,17,2,9,4
-National,2025-01-06,Pallas Data,IVR,1328,2.7,25,42,18,4,9,1
-National,2025-01-05,Research Co.,NET,1002,3.1,21,47,15,3,10,2
-National,2025-01-03,Nanos Research,TEL,1021,3.1,23,45,16,5,8,3
+National,2025-04-04,Liaison Strategies / NEPMCC,NET,1625,2.4,46,38,6,2,4,2
+National,2025-04-04,Mainstreet Research,NET,1625,2.4,43,40,6,1,6,2
+National,2025-04-04,Nanos Research / CTV-Globe and Mail,T/N,1248,2.8,46,35,9,3,5,1
+National,2025-04-03,Liaison Strategies / NEPMCC,IVR,1500,2.5,46,38,6,2,4,3
+National,2025-04-03,Mainstreet Research,NET,1665,2.4,43,40,7,1,7,2
+National,2025-04-03,Nanos Research / CTV-Globe and Mail,T/N,1241,2.8,46,36,9,2,5,1
+National,2025-04-03,EKOS Research,IVR,1685,2.4,49,34,7,3,5,1
+National,2025-04-02,Liaison Strategies / NEPMCC,IVR,1500,2.5,45,37,6,2,5,3
+National,2025-04-02,Mainstreet Research,NET,1756,2.3,44,40,7,1,6,2
+National,2025-04-02,Nanos Research / CTV-Globe and Mail,T/N,1248,2.8,46,37,9,2,6,1
+National,2025-04-02,EKOS Research,NET,1513,2.5,47,33,10,2,4,3
+National,2025-04-01,Liaison Strategies / NEPMCC,IVR,1500,2.5,44,39,6,2,5,3
+National,2025-04-01,Mainstreet Research,NET,1651,2.4,43,40,9,1,5,2
+National,2025-04-01,Nanos Research / CTV-Globe and Mail,T/N,1256,2.8,45,37,9,2,5,1
+National,2025-03-31,Pallas Data,IVR,1267,2.7,45,36,9,3,6,2
+National,2025-03-31,Liaison Strategies / NEPMCC,IVR,1500,2.5,44,38,6,2,5,3
+National,2025-03-31,Mainstreet Research,NET,1628,2.4,44,41,7,1,5,2
+National,2025-03-31,Nanos Research / CTV-Globe and Mail,T/N,1264,2.7,45,37,10,2,6,1
+National,2025-03-31,Angus Reid Institute,NET,2131,2.1,46,38,7,1,7,1
+National,2025-03-31,Innovative Research Group,NET,1742,2.3,37,38,12,3,6,2
+National,2025-03-31,Léger / National Post-Journal de Montréal,NET,3002,1.8,44,38,7,3,5,2
+National,2025-03-30,Liaison Strategies / NEPMCC,IVR,1500,2.5,43,38,7,2,5,3
+National,2025-03-30,Mainstreet Research,NET,1589,2.5,43,40,6,2,5,3
+National,2025-03-30,Nanos Research / CTV-Globe and Mail,T/N,1264,2.7,44,36,11,2,5,2
+National,2025-03-30,EKOS Research,IVR,1517,2.5,48,36,6,2,5,2
+National,2025-03-30,Pollara Strategic Insights / Curse of Politics,T/N,1734,2.3,44,35,10,3,5,2
+National,2025-03-29,Liaison Strategies / NEPMCC,IVR,1500,2.5,42,38,7,3,6,3
+National,2025-03-29,Mainstreet Research,NET,1704,2.4,42,40,7,2,5,3
+National,2025-03-29,Nanos Research / CTV-Globe and Mail,T/N,1285,2.7,42,37,11,3,5,2
+National,2025-03-29,MQO Research / Global Public Affairs,NET,1650,2.4,45,34,11,4,4,2
