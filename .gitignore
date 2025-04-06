@@ -2,6 +2,7 @@
 *.geojson
 *.csv
 *.csv
+**.*.csv
 *.qmd
 election_map/ridings.db
 election_map/ridings-v1.js
