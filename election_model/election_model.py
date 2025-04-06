@@ -52,6 +52,7 @@ ridingidlist = ridingidids[0].tolist()
 # Create DataFrame to store all election simulation results
 ######################################################################################################################
 dfridingprobabilities = pd.DataFrame(index = ridingidlist, columns = ['lpc', 'cpc', 'ndp', 'gpc', 'bq', 'ppc'])
+dfridingprobabilities.index.name = 'FED_NUM'
 dfridingprobabilities = dfridingprobabilities.fillna(0)
 
 ######################################################################################################################
@@ -295,7 +296,7 @@ def SimulateElection():
 
 
 #SimulateElection()
-SimulateMultipleElections(10)
+SimulateMultipleElections(10000)
 
 ######################################################################################################################
 # Execute script to update seat projections

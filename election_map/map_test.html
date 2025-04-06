@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GeoJSON Map Visualization</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        #map {
+            height: 600px;
+            width: 100%;
+        }
+        .info {
+            padding: 6px 8px;
+            font: 14px/16px Arial, Helvetica, sans-serif;
+            background: white;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+        .legend {
+            line-height: 18px;
+            color: #555;
+        }
+        .legend i {
+            width: 18px;
+            height: 18px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.7;
+        }
+        .info.locked {
+             border: 2px solid #555;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script>
+        // Initialize the map
+        var map = L.map('map').setView([56.1304, -106.3468], 4); // Set initial center and zoom level
+
+        // Add a base map layer (you can change this to any tile provider you prefer)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Variables keeping track of locked or unlocked state
+        var isInfoLocked = false;
+        var lockedFeatureProps = null;
+        var lockedLayer = null;
+        var highlightedLayer = null; // Keep track of the visually highlighted layer
+
+        // Default style for features
+        function defaultStyleFunc(feature) {
+            return {
+                fillColor: feature.properties.Fill || '#CCCCCC',
+                weight: 1,
+                opacity: 1,
+                color: 'white',
+                dashArray: '3',
+                fillOpacity: 0.7
+            };
+        }
+        // Style for temporary hover highlight
+        const highlightStyle = {
+            weight: 3,
+            color: '#666',
+            dashArray: '',
+            fillOpacity: 0.9
+        };
+        // Style for persistent locked highlight
+        const lockedStyle = {
+            weight: 3, // Make locked features stand out
+            color: '#333', // Darker border for locked
+            dashArray: '',
+            fillOpacity: 0.8 // Slightly different opacity if desired
+        };
+
+        // Control that shows riding info on hover
+        var info = L.control();
+
+        info.onAdd = function (map) {
+            this._div = L.DomUtil.create('div', 'info');
+            this.update();
+            return this._div;
+        };
+
+        // Information to populate the pop-up
+        info.update = function (props) {
+            var content = '<h4>Canadian Electoral Riding</h4>';
+            // Use locked properties if locked, otherwise use hover properties (props)
+            var displayProps = isInfoLocked ? lockedFeatureProps : props;
+            
+            // Dynamic content to remove any ridings where a party is polling at 0% (e.g., the BQ anywhere outside Québéc)
+            if (displayProps) {
+                content += '<b>' + displayProps.ED_NAMEE + ': ' + displayProps.FED_NUM + '</b><br />';
+
+                if (displayProps.CPC !== 0) {
+                    content += '<b>CPC: </b>' + displayProps.CPC + ' +/- ' + displayProps.CPCSTD + '%<br />';
+                }
+                if (displayProps.LPC !== 0) {
+                    content += '<b>LPC: </b>' + displayProps.LPC + ' +/- ' + displayProps.LPCSTD + '%<br />';
+                }
+                if (displayProps.NDP !== 0) {
+                    content += '<b>NDP: </b>' + displayProps.NDP + ' +/- ' + displayProps.NDPSTD + '%<br />';
+                }
+                if (displayProps.GPC !== 0) {
+                    content += '<b>GPC: </b>' + displayProps.GPC + ' +/- ' + displayProps.GPCSTD + '%<br />';
+                }
+                if (displayProps.BQ !== 0) {
+                    content += '<b>BQ: </b>' + displayProps.BQ + ' +/- ' + displayProps.BQSTD + '%<br />';
+                }
+                if (displayProps.PPC !== undefined && displayProps.PPC !== 0) { // Check if PPC exists and is not 0
+                    content += '<b>PPC: </b>' + displayProps.PPC + ' +/- ' + displayProps.PPCSTD + '%<br />';
+                }
+            } else {
+                content += 'Hover over a riding';
+            }
+            
+            // Add Locked indication if needed
+             if (isInfoLocked) {
+                 content += '<br /><i>(Locked - Click map to unlock)</i>';
+             }
+
+            this._div.innerHTML = content;
+
+             // Add/remove locked class for styling (optional)
+             if (isInfoLocked) {
+                 L.DomUtil.addClass(this._div, 'locked');
+             } else {
+                 L.DomUtil.removeClass(this._div, 'locked');
+             }
+        };
+        
+        // Add pop-ups to the map
+        info.addTo(map); 
+
+        // Define highlight and reset functions for mouse events
+        // Highlight triggered by mouseover
+        function highlightFeature(e) {
+            var layer = e.target;
+
+            // Apply temporary highlight style, unless it's the locked layer
+            if (layer !== lockedLayer) {
+                layer.setStyle(highlightStyle);
+                layer.bringToFront(); // Bring hovered layer forward
+            }
+            
+            // Ensure locked layer stays on top if hovered over something else
+            if (lockedLayer) {
+                lockedLayer.bringToFront();
+            }
+
+            // Only update info panel if it's not locked
+            if (!isInfoLocked) {
+                info.update(layer.feature.properties);
+            }
+        }
+
+        // resertHighlight triggered by mouseout
+        function resetHighlight(e) {
+            var layer = e.target;
+            
+            // Reset style if it's not the locked layer
+            // Use geojsonLayer.resetStyle to revert to the style defined by the 'style' function
+            if (layer !== lockedLayer && geojsonLayer) { 
+                 geojsonLayer.resetStyle(layer);
+            }
+
+            // Only update info panel if it's not locked
+            if (!isInfoLocked) {
+                info.update();
+            }
+        }
+
+        function onEachFeature(feature, layer) {
+            layer.on({
+                mouseover: highlightFeature,
+                mouseout: resetHighlight,
+                click: function(e) {
+                    var clickedLayer = e.target;
+                    var clickedProps = clickedLayer.feature.properties;
+
+                    if (isInfoLocked) {
+                        // --- If something is already locked ---
+                        if (clickedLayer !== lockedLayer) {
+                            // Clicked a different layer: Unlock the previous one
+                            let previousLockedLayer = lockedLayer; // Store reference to reset style
+                            
+                            // Update state
+                            isInfoLocked = false;
+                            lockedLayer = null;
+                            lockedFeatureProps = null;
+
+                            // Reset style of the previously locked layer
+                            if (geojsonLayer && previousLockedLayer) {
+                                geojsonLayer.resetStyle(previousLockedLayer);
+                            }
+                            
+                            // Update info panel
+                            info.update(); 
+                            
+
+                        } else {
+                            // Could potentially implement unlock on same-layer click here if desired later
+                        }
+                    } else {
+                        // --- If nothing is locked ---
+                        // Lock onto the clicked layer
+                        isInfoLocked = true;
+                        lockedLayer = clickedLayer;
+                        lockedFeatureProps = clickedProps;
+
+                        // Apply persistent locked style
+                        lockedLayer.setStyle(lockedStyle);
+                        lockedLayer.bringToFront(); // Ensure locked layer is on top
+
+                        // Update info panel
+                        info.update(lockedFeatureProps);
+                    }
+                    
+                    // Prevent click propagation
+                    L.DomEvent.stopPropagation(e); 
+                }
+            });
+        }
+        
+        // Add listener so clicking on background map also unlocks map
+        map.on('click', function(e) {
+                if (isInfoLocked) {
+                    // Unlock the map
+                    let previousLockedLayer = lockedLayer;
+
+                    isInfoLocked = false;
+                    lockedLayer = null;
+                    lockedFeatureProps = null;
+
+                    // Reset style of the previously locked layer
+                    if (geojsonLayer && previousLockedLayer) {
+                        geojsonLayer.resetStyle(previousLockedLayer);
+                    }
+
+                    // Update the info panel
+                    info.update();
+                }
+            });
+        // Load and display the GeoJSON data
+        var geojsonLayer;
+        fetch('election_forecast_2025.geojson')
+            .then(response => response.json())
+            .then(data => {
+                // Add GeoJSON layer to the map
+                geojsonLayer = L.geoJSON(data, {
+                    style: defaultStyleFunc,
+                    onEachFeature: onEachFeature
+                }).addTo(map);
+            })
+            // Error handling
+            .catch(error => console.error('Error loading GeoJSON:', error));
+    </script>
+</body>
+</html>

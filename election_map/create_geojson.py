@@ -99,8 +99,10 @@ gdf_final = gdf_merged.merge(
 )
 
 # Save merged geojson for use in map
-filename = (str(date.today())+ "_election_results_20215.geojson")
-gdf_merged.to_file(filename, driver='GeoJSON')
+#filename = (str(date.today())+ "_election_results_2025.geojson")
+#gdf_final.to_file(filename, driver='GeoJSON')
 
+filename = ("election_map//election_forecast_2025.geojson")
+gdf_final.to_file(filename, driver='GeoJSON')
 # Success!
 print("Geojson created")
