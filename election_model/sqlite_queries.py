@@ -5,7 +5,7 @@ import pandas as pd
 ######################################################################################################################
 # Set directory, enable coding timer, and connect SQLite3 database
 ######################################################################################################################
-#os.chdir("C://projects//election_forecast")
+os.chdir("C://projects//election_forecast")
 
 #conn = sqlite3.connect('election_database/election_database.db')
 #c = conn.cursor()
@@ -21,4 +21,5 @@ import pandas as pd
 
 #df_polls = pd.read_csv('election_database/recent_polls_2025.csv')
 #df_polls.to_sql('polls', conn, if_exists = 'append', index = False)
+#conn.close()
 
