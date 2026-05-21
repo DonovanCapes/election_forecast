@@ -1,0 +1,54 @@
+name: Daily Election Forecast Update
+
+on:
+  schedule:
+    - cron: '0 12 * * *'  # noon UTC (8am ET / 5am PT)
+  workflow_dispatch:        # allow manual trigger from GitHub UI
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout election_forecast repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Scrape polls
+        run: python election_database/scrape_polls.py
+
+      - name: Run election model
+        run: python election_model/election_model.py
+
+      - name: Build GeoJSON
+        run: python election_map/create_geojson.py
+
+      - name: Commit updated database
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add election_database/election_database.db
+          git diff --staged --quiet || git commit -m "Daily poll update $(date -u +%Y-%m-%d)"
+          git push
+
+      - name: Push outputs to site repo
+        env:
+          SITE_REPO_TOKEN: ${{ secrets.SITE_REPO_TOKEN }}
+        run: |
+          git clone https://x-access-token:${SITE_REPO_TOKEN}@github.com/DonovanCapes/donovancapes.github.io.git site_repo
+          cp election_map/election_forecast_2025.geojson site_repo/election_forecast_2025.geojson
+          cp model_results/ridingvotepercents.csv site_repo/assets/data/ridingvotepercents.csv
+          cd site_repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add election_forecast_2025.geojson assets/data/ridingvotepercents.csv
+          git diff --staged --quiet || git commit -m "Daily forecast update $(date -u +%Y-%m-%d)"
+          git push

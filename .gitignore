@@ -5,6 +5,7 @@
 *.csv
 **.*.csv
 *.qmd
+election_database/*_backup_*.db
 election_map/ridings.db
 election_map/ridings-v1.js
 election_map/ridings.js
