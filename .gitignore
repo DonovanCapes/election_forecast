@@ -1,5 +1,6 @@
 *.json
 *.geojson
+!election_map/electoral_districts_2022_fed.geojson
 *.csv
 *.csv
 **.*.csv
