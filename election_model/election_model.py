@@ -19,11 +19,11 @@ from datetime import date, datetime
 ######################################################################################################################
 # Set directory, enable coding timer, and connect SQLite3 database
 ######################################################################################################################
-os.chdir("C://projects//election_forecast")
+PROJECT_ROOT = pathlib.Path(__file__).parent.parent
 
 start_time = time.time()
 
-conn = sqlite3.connect('election_database/election_database.db')
+conn = sqlite3.connect(PROJECT_ROOT / 'election_database' / 'election_database.db')
 c = conn.cursor()
 
 ######################################################################################################################
@@ -100,7 +100,7 @@ def weightavg(party):
 # Global variables for storing model outputs
 ######################################################################################################################
 n = 1
-path = "C:/projects/election_forecast/model_results"
+path = PROJECT_ROOT / 'model_results'
 
 ######################################################################################################################
 # Monte Carlo Simulation

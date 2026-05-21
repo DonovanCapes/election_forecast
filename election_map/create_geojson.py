@@ -1,20 +1,19 @@
 import geopandas as gpd
 import pandas as pd
-import os 
+from pathlib import Path
 from datetime import date
 
-# Set working directory
-os.chdir("C://projects//election_forecast")
+PROJECT_ROOT = Path(__file__).parent.parent
 
 # Load the GeoJSON file with electoral ridings
-gdf = gpd.read_file('election_map//electoral_districts_2022_fed.geojson')
+gdf = gpd.read_file(PROJECT_ROOT / 'election_map' / 'electoral_districts_2022_fed.geojson')
 
 # Load the forecasted election results
-df_election = pd.read_csv('model_results//ridingvotepercents.csv')
+df_election = pd.read_csv(PROJECT_ROOT / 'model_results' / 'ridingvotepercents.csv')
 df_election.columns = [col.upper() for col in df_election.columns]
 
 # Load win probabilities
-df_win_probs = pd.read_csv('model_results//ridingprobabilities.csv')
+df_win_probs = pd.read_csv(PROJECT_ROOT / 'model_results' / 'ridingprobabilities.csv')
 
 # Process win probabilities data to determine winner and margin
 win_columns = ['LPCwins', 'CPCwins', 'NDPwins', 'GPCwins', 'BQwins', 'PPCwins']
@@ -102,7 +101,7 @@ gdf_final = gdf_merged.merge(
 #filename = (str(date.today())+ "_election_results_2025.geojson")
 #gdf_final.to_file(filename, driver='GeoJSON')
 
-filename = ("election_map//election_forecast_2025.geojson")
+filename = PROJECT_ROOT / 'election_map' / 'election_forecast_2025.geojson'
 gdf_final.to_file(filename, driver='GeoJSON')
 # Success!
 print("Geojson created")

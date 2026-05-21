@@ -1,4 +1,7 @@
 import folium
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).parent.parent
 
 # Create a base map centered on Canada
 m = folium.Map(location=[56, -94], zoom_start=4, tiles='CartoDB positron')
@@ -196,6 +199,6 @@ custom_js = custom_js.replace('MAPID', m.get_name())
 m.get_root().html.add_child(folium.Element(custom_js))
 
 # Save the base map to an HTML file
-m.save('index.html')
+m.save(PROJECT_ROOT / 'election_map' / 'index.html')
 
 print("Map template has been saved as index.html")

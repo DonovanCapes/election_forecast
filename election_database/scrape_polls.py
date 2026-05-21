@@ -14,10 +14,12 @@ import math
 import re
 import sqlite3
 import sys
+from pathlib import Path
 
 import requests
 
-DB_PATH = "election_database/election_database.db"
+PROJECT_ROOT = Path(__file__).parent.parent
+DB_PATH = PROJECT_ROOT / 'election_database' / 'election_database.db'
 URL = "https://338canada.com/polls.htm"
 
 # Fixed cell order on 338Canada: LPC, CPC, NDP, GPC, BQ
