@@ -25,7 +25,7 @@ CSV_2025 = 'election_database/2025_fed_election_results.csv'
 PARTY_PATTERNS = [
     ('ndp', r'NDP'),
     ('gpc', r'Green Party'),
-    ('bq',  r'Bloc'),
+    ('bq',  r'\bBloc\b'),
     ('ppc', r"People's Party"),
     ('lpc', r'\bLiberal/'),       # matches "Liberal/Libéral" only
     ('cpc', r'\bConservative/'),  # matches "Conservative/Conservateur" only
