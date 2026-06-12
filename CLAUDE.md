@@ -7,7 +7,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 All scripts use `os.chdir("C://projects//election_forecast")` and must be run from the project root. Use the local venv:
 
 ```powershell
-# Run the forecast model (10,000 simulations, ~several minutes)
+# Run the forecast model — weighted baseline: 2025=60%, 2021=30%, 2019=10% (primary)
+.venv/Scripts/python.exe election_model/election_model_weighted.py
+
+# Run the forecast model — pure 2025 baseline (for comparison)
 .venv/Scripts/python.exe election_model/election_model.py
 
 # Rebuild the GeoJSON from model outputs
@@ -45,7 +48,7 @@ newvote = riding_baseline + (propchange * riding_baseline)
 
 Error is injected per-party per-simulation via `AddErr()`, sampling from `Normal(0,1)/2 * weightedMoE`.
 
-NOTE: The model currently still queries `results2021` and `electionresults` (old table names). It needs to be updated to query `riding_results` and `federal_results`, and to use a weighted multi-election baseline (planned: 2025=60%, 2021=30%, 2019=10%).
+Two model variants exist: `election_model_weighted.py` (primary — weighted baseline: 2025=60%, 2021=30%, 2019=10%) and `election_model.py` (pure 2025 baseline, kept for comparison). For the 5 new ridings with no 2019 data, the 10% rolls into 2025 (70/30 split). Both write to the same `model_results/` outputs.
 
 Outputs four CSVs to `model_results/`: `ridingvotepercents.csv`, `ridingprobabilities.csv`, `seatcounts.csv`, `seatstats.csv`.
 
